@@ -1,10 +1,10 @@
 import React, { use } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { AuthContext } from '../../Provider/AuthProvider';
 
 const Register = () => {
-
-    const { createUser, setUser,user } = use(AuthContext);
+    const navigate = useNavigate();
+    const { createUser, setUser, updateUserData } = use(AuthContext);
 
     const handleRegister = (e) => {
         e.preventDefault();
@@ -12,12 +12,20 @@ const Register = () => {
         const photourl = e.target.photourl.value;
         const email = e.target.email.value;
         const password = e.target.password.value;
-        console.log(name, email, password, photourl);
+        
 
         createUser(email, password)
             .then((userCredential) => {
-                setUser(userCredential);
-                console.log(user);
+                const user = userCredential.user;
+                updateUserData(
+                    {displayName: name,
+                        photoURL: photourl
+                    }).then(() => {
+                        setUser({ ...user, displayName: name, photoURL: photourl });
+                        navigate('/');
+                    }).catch((error) => {
+                        console.log(error);
+                    })
             })
             .catch((error) => {
                 console.log(error);

@@ -1,10 +1,13 @@
-import React, { use } from 'react';
-import { Link } from 'react-router';
+import React, { use, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../../Provider/AuthProvider';
 
 const Login = () => {
     const { loginWithEmlPss, setUser } = use(AuthContext);
-    
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [error, setError] = useState('');
+
     const handleLogin = (e) => {
         e.preventDefault();
         const email = e.target.email.value;
@@ -12,11 +15,11 @@ const Login = () => {
         loginWithEmlPss(email, password)
             .then(userCredential => {
                 setUser(userCredential);
+                navigate(`${location.state? location.state: '/'}`)
             })
             .catch(error => {
-                console.log(error);
+                setError(error.code);
         })
-        console.log('login',email,password);
     }
     return (
         <div className='flex justify-center min-h-screen items-center'>
@@ -32,6 +35,7 @@ const Login = () => {
                             <label className="label">Password</label>
                             <input type="password" name='password' className="input" placeholder="Password" />
                             <div><a className="link link-hover">Forgot password?</a></div>
+                            <span className='text-red-600'>{error}</span>
                             <button className="btn btn-neutral mt-4">Login</button>
                             <p className='mt-3'>Don't  have an Account? <Link className='text-secondary font-semibold underline' to='/auth/register'>Register</Link></p>
                         </fieldset>
